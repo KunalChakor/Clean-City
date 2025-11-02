@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean City - Smart Waste Management</title>
+    <!-- Font remains Poppins as it's modern and clean -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate on Scroll (AOS) stylesheet - Kept for existing animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- 
+    =====================================================================
+    NEW AESTHETIC STYLESHEET (Azure & Coral Theme)
+    All styles below have been rewritten to match the new design.
+    The original CSS has been completely replaced.
+    =====================================================================
+    -->
+    <style>
+        /* --- 1. Root Variables & Global Setup --- */
+        :root {
+            /* Azure/Blue Palette */
+            --glass-bg: rgba(67, 131, 150, 0.65); /* Main glass panel color */
+            --glass-bg-hover: rgba(67, 131, 150, 0.8);
+            --header-bg: rgba(40, 80, 100, 0.7); /* Darker glass for header */
+            --input-bg: rgba(0, 0, 0, 0.2);
+            --input-bg-focus: rgba(0, 0, 0, 0.3);
+            
+            /* Leaf Green Palette */
+            --text-heading: #cffafe; /* Light cyan/mint for headings */
+            --text-body: #f0f8ff; /* Alice blue (soft white) for body */
+            --text-label: #ffffff;
+            --text-placeholder: #b0c4de; /* Light steel blue */
+            --pickup-event-bg: rgba(144, 238, 144, 0.2);
+            --pickup-event-border: #90ee90;
+            
+            /* Coral/Peach/Terracotta Palette (Complements) */
+            --btn-grad-start: #ff8c69; /* Peach */
+            --btn-grad-end: #ff6347; /* Coral/Tomato */
+            --btn-grad-hover-start: #ff9a8a;
+            --btn-grad-hover-end: #ff7f50;
+            --btn-shadow: rgba(255, 100, 70, 0.3);
+            --btn-shadow-hover: rgba(255, 100, 70, 0.5);
+            
+            /* General UI */
+            --border-radius-main: 20px;
+            --border-radius-btn: 10px;
+            --border-glass: 1px solid rgba(255, 255, 255, 0.2);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* NEW: Apply the new background image */
+            background-image: url('https://i.pinimg.com/1200x/00/54/28/00542859a2882f919840fd91615930e6.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Ensures BG is static on scroll */
+            min-height: 100vh;
+            color: var(--text-body);
+        }
+
+        /* NEW: Global overlay to ensure text readability on the new BG */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 30, 40, 0.2); /* Subtle dark-blue overlay */
+            z-index: -1;
+        }
+
+        /* --- 2. Page Switching Logic (Unchanged) --- */
+        .page {
+            display: none;
+            position: relative;
+            z-index: 1; /* Sit above the ::before overlay */
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* --- 3. Login Page --- */
+        .login-page {
+            min-height: 100vh;
+            /* Removed all old background styles */
+            position: relative;
+        }
+        .login-page.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Removed old .login-page::before overlay */
+
+        /* NEW: Glassmorphism Login Container */
+        .login-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            padding: 50px 40px;
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            width: 400px;
+            max-width: 90%;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            background: var(--glass-bg-hover);
+            box-shadow: var(--shadow-glass-hover);
+        }
+
+        .login-container h1 {
+            color: var(--text-heading);
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-align: center;
+        }
+        .login-container p {
+            color: var(--text-body);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* NEW: Input Styling */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            color: var(--text-label);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            color: var(--text-label);
+            transition: all 0.3s;
+        }
+        .input-group input::placeholder {
+            color: var(--text-placeholder);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--btn-grad-end); /* Focus with Coral */
+            background: var(--input-bg-focus);
+        }
+
+        /* NEW: Coral Button Styling */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+        .login-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+            background: linear-gradient(135deg, var(--btn-grad-hover-start), var(--btn-grad-hover-end));
+        }
+
+        /* --- 4. Shared Header --- */
+        .header {
+            background: var(--header-bg); /* Darker glass */
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: var(--border-glass);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .search-bar {
+            padding: 8px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            width: 250px;
+            background: var(--input-bg);
+            color: var(--text-label);
+            transition: all 0.3s ease;
+        }
+        .search-bar::placeholder {
+            color: var(--text-placeholder);
+        }
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--btn-grad-end);
+            background: var(--input-bg-focus);
+        }
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--btn-grad-end); /* Use Coral for the initial */
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .profile-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--btn-shadow);
+        }
+
+        /* --- 5. Shared Page & Card Styles --- */
+        .page-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        /* NEW: Coral Back Button */
+        .back-btn {
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-btn);
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+            background: linear-gradient(135deg, var(--btn-grad-hover-start), var(--btn-grad-hover-end));
+        }
+
+        /* NEW: Standard Glass Card for Info Sections */
+        .info-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            padding: 30px;
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            margin-bottom: 25px;
+        }
+        .info-section h2 {
+            color: var(--text-heading);
+            margin-bottom: 20px;
+        }
+        
+        /* --- 6. Dashboard Page --- */
+        .dashboard-page {
+            /* BG is on body */
+        }
+
+        /* NEW: Clean Banner Text */
+        .banner {
+            background: none; /* Removed old gradient/SVG */
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 48px;
+            font-weight: 700;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+        }
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto 50px; /* Removed negative margin */
+            padding: 0 20px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* NEW: Glass Feature Card */
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            padding: 30px;
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--btn-grad-end); /* Coral accent */
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: var(--glass-bg-hover);
+            box-shadow: var(--shadow-glass-hover);
+        }
+        .feature-card h3 {
+            color: var(--text-heading);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        .feature-card p {
+            color: var(--text-body);
+            font-size: 14px;
+        }
+
+        /* NEW: Glass News Section (matches other cards) */
+        .news-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            padding: 30px;
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            margin-top: 30px;
+        }
+        .news-section h2 {
+            color: var(--text-heading);
+            margin-bottom: 20px;
+        }
+        .news-item {
+            padding: 15px;
+            border-left: 3px solid var(--btn-grad-end); /* Coral accent */
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.2); /* Dark transparent */
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .news-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .news-item strong {
+            color: var(--text-label);
+        }
+        .news-item p {
+            color: var(--text-body);
+        }
+
+        /* --- 7. Rewards Page --- */
+        .rewards-page {
+             /* BG is on body */
+        }
+        .rewards-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        /* NEW: Coral Points Display */
+        .points-display {
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius-main);
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+        }
+        .points-display h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .points-display p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* NEW: List items inside glass card */
+        .info-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .info-section li {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.2); /* Dark transparent */
+            border-radius: 8px;
+            border-left: 4px solid var(--btn-grad-end); /* Coral accent */
+            color: var(--text-body);
+        }
+        .info-section li strong {
+            color: var(--text-heading);
+        }
+
+        /* NEW: Coral Redeem Button */
+        .redeem-btn {
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: var(--border-radius-btn);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+        .redeem-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+            background: linear-gradient(135deg, var(--btn-grad-hover-start), var(--btn-grad-hover-end));
+        }
+
+        /* --- 8. Calendar Page --- */
+        .calendar-page {
+            /* BG is on body */
+        }
+        
+        /* NEW: Glass Calendar Container */
+        .calendar-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            overflow: hidden; 
+        }
+        /* NEW: Coral Calendar Header */
+        .calendar-header {
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* NEW: Styled Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.1); /* Light grid lines */
+        }
+        .calendar-grid div {
+            padding: 20px;
+            min-height: 120px;
+            background: rgba(0, 0, 0, 0.1); /* Dark transparent cell */
+            transition: all 0.3s ease;
+        }
+        .calendar-grid div:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .calendar-grid .day-name {
+            min-height: auto;
+            text-align: center;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.3); /* Darker header */
+            padding: 15px;
+            color: var(--text-heading);
+        }
+        .calendar-grid .day-number {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-label);
+        }
+        .calendar-grid .other-month {
+            background: rgba(0, 0, 0, 0.05);
+            color: #aaa;
+        }
+        
+        /* NEW: Leaf Green Pickup Event */
+        .pickup-event {
+            background: var(--pickup-event-bg);
+            border-left: 4px solid var(--pickup-event-border);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 10px;
+            color: var(--text-body);
+        }
+
+        /* --- 9. Community Hub Page --- */
+        .community-page {
+            /* BG is on body */
+        }
+
+        /* NEW: Glass Chat Container */
+        .chat-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 160px); 
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .chat-header h2 {
+            color: var(--text-heading);
+            margin: 0;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-message {
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 75%;
+        }
+        /* NEW: Coral User Message */
+        .chat-message.user {
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        /* NEW: Dark Glass Other Message */
+        .chat-message.other {
+            background: rgba(0, 0, 0, 0.3); 
+            color: var(--text-body);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-message .sender {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            opacity: 0.8;
+            color: var(--text-heading);
+        }
+        .chat-message.user .sender {
+            color: white;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            color: var(--text-label);
+            transition: all 0.3s;
+        }
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--btn-grad-end);
+            background: var(--input-bg-focus);
+        }
+        /* NEW: Coral Send Button */
+        .chat-input button {
+            padding: 0 25px;
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+        .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+            background: linear-gradient(135deg, var(--btn-grad-hover-start), var(--btn-grad-hover-end));
+        }
+        
+        /* --- 10. Smart Bin Page --- */
+        .smart-bin-page {
+             /* BG is on body */
+        }
+        .page-title {
+            color: var(--text-label); /* White title */
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .bin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        /* NEW: Glass Bin Card */
+        .bin-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            padding: 25px;
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-glass);
+            transition: all 0.3s ease;
+        }
+        .bin-card:hover {
+            transform: translateY(-5px);
+            background: var(--glass-bg-hover);
+            box-shadow: var(--shadow-glass-hover);
+        }
+        .bin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .bin-card-header h3 {
+            color: var(--text-heading);
+            margin: 0;
+        }
+        
+        .bin-card-header .bin-id {
+            font-size: 14px;
+            color: #ccc;
+        }
+        .bin-card p {
+            font-size: 14px;
+            color: var(--text-body);
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--input-bg); /* Dark transparent bg */
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Status colors are good, kept them */
+        .progress-fill.status-ok { background: #10b981; }
+        .progress-fill.status-warn { background: #f59e0b; }
+        .progress-fill.status-full { background: #ef4444; }
+        .status-text {
+            text-align: right;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .status-text.status-ok { color: #10b981; }
+        .status-text.status-warn { color: #f59e0b; }
+        .status-text.status-full { color: #ef4444; }
+
+        /* --- 11. Modal Styles --- */
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes modalZoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7); /* Darker overlay for focus */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        /* NEW: Glass Modal Content */
+        .modal-content {
+            background: var(--glass-bg-hover); /* Slightly more opaque glass */
+            backdrop-filter: blur(15px);
+            border: var(--border-glass);
+            padding: 40px;
+            border-radius: var(--border-radius-main);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: modalZoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-content h2 {
+            color: var(--text-heading);
+            margin-bottom: 20px;
+        }
+        .modal-content p {
+            color: var(--text-body);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #aaa;
+            transition: all 0.3s ease;
+        }
+        .close-modal:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* --- 12. Report Form Modal Styles --- */
+        .report-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .report-form-group label {
+            display: block;
+            color: var(--text-label);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .report-form-group input[type="text"],
+        .report-form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            color: var(--text-label);
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .report-form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .report-form-group input[type="text"]:focus,
+        .report-form-group textarea:focus {
+            outline: none;
+            border-color: var(--btn-grad-end); /* Coral focus */
+            background: var(--input-bg-focus);
+        }
+        .report-form-group input[type="file"] {
+            display: none;
+        }
+        .file-upload-label {
+            display: inline-block;
+            padding: 12px 20px;
+            background: var(--input-bg);
+            border: 2px dashed var(--btn-grad-end); /* Coral dashed border */
+            border-radius: var(--border-radius-btn);
+            cursor: pointer;
+            color: var(--btn-grad-start); /* Peach text */
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .file-upload-label:hover {
+            background: var(--input-bg-focus);
+        }
+        
+        #fileNamePreview {
+            margin-left: 15px;
+            color: var(--text-body);
+            font-style: italic;
+        }
+
+        /* NEW: Coral Submit Button */
+        .report-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--btn-grad-start), var(--btn-grad-end));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-btn);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--btn-shadow);
+        }
+        
+        .report-submit-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px var(--btn-shadow-hover);
+            background: linear-gradient(135deg, var(--btn-grad-hover-start), var(--btn-grad-hover-end));
+        }
+
+        /* NEW: Redeem List Styling in Modal */
+        .redeem-item {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--btn-grad-end); /* Coral accent */
+            text-align: left;
+        }
+        .redeem-item strong {
+            color: var(--text-heading);
+        }
+        .redeem-item p {
+            font-size: 14px;
+        }
+        #pointsInModal {
+            color: var(--text-heading); /* Green text for points */
+        }
+
+        /* --- 13. Media Queries (Mostly Unchanged) --- */
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-bar {
+                width: 150px;
+            }
+            .banner {
+                font-size: 32px; /* Slightly smaller on mobile */
+                padding: 40px 20px;
+            }
+            .calendar-grid {
+                grid-template-columns: 1fr; 
+            }
+            .calendar-grid .day-name {
+                display: none; 
+            }
+            .calendar-grid div {
+                min-height: auto;
+                padding: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .chat-container {
+                height: calc(100vh - 140px); 
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+    =====================================================================
+    HTML BODY
+    This content is IDENTICAL to your DOCX file.
+    All functionality is preserved.
+    =====================================================================
+    -->
+    <div id="loginPage" class="page active login-page">
+        <div class="login-container" data-aos="zoom-in">
+            <h1> 🏙  CLEAN CITY</h1>
+            <p>Sign in to continue</p>
+            <div class="input-group">
+                <label>Name</label>
+                <input type="text" id="username" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+            <button class="login-btn" onclick="login()">Log In</button>
+        </div>
+    </div>
+    <div id="dashboardPage" class="page dashboard-page">
+        <div class="header">
+            <div class="logo"> 🏙  CLEAN CITY</div>
+            <div class="header-right">
+                <input type="text" class="search-bar" placeholder="Search...">
+                <div class="profile-icon" id="userInitial">U</div>
+            </div>
+        </div>
+        <div class="banner">Our City, Our Responsibility</div>
+        <div class="features-container">
+            <div class="features-grid">
+                <div class="feature-card" onclick="showWasteModal()" data-aos="fade-up" data-aos-delay="100">
+                    <h3> ♻️  Waste Segregation</h3>
+                    <p>Submit your waste type and earn points for proper disposal</p>
+                </div>
+                <div class="feature-card" onclick="showRewardsPage()" data-aos="fade-up" data-aos-delay="200">
+                    <h3> 🎁  My Rewards</h3>
+                    <p>View and redeem your earned points for exciting benefits</p>
+                </div>
+                <div class="feature-card" onclick="showReportModal()" data-aos="fade-up" data-aos-delay="300">
+                    <h3> 🚨  Report Crime</h3>
+                    <p>Report illegal dumping or littering in your area</p>
+                </div>
+                <div class="feature-card" onclick="showCommunityPage()" data-aos="fade-up" data-aos-delay="100">
+                    <h3> 👥  Community Hub</h3>
+                    <p>Join awareness drives and community events</p>
+                </div>
+                 <div class="feature-card" onclick="showSmartBinPage()" data-aos="fade-up" data-aos-delay="200">
+                    <h3> 🗑️  Smart Bin Status</h3>
+                    <p>Check nearby bins and their fill levels in real-time</p>
+                </div>
+                <div class="feature-card" onclick="showCalendarPage()" data-aos="fade-up" data-aos-delay="300">
+                    <h3> 📅  Pickup Calendar</h3>
+                    <p>Schedule and track your garbage pickup days</p>
+                </div>
+            </div>
+            <div class="news-section" data-aos="fade-up" data-aos-delay="400">
+                <h2> 📰  Get News</h2>
+                <div class="news-item">
+                    <strong>New Recycling Initiative Launched</strong>
+                    <p>City announces expanded recycling program with door-to-door collection</p>
+                </div>
+                <div class="news-item">
+                    <strong>Community Cleanup Drive This Weekend</strong>
+                    <p>Join us for a city-wide cleanup event and earn bonus points!</p>
+                </div>
+                <div class="news-item">
+                    <strong>Smart Bins Installation Complete</strong>
+                    <p>Over 500 smart bins now active across all districts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="rewardsPage" class="page rewards-page">
+        <div class="header">
+            <div class="logo"> 🏙  CLEAN CITY</div>
+            <div class="header-right">
+                <div class="profile-icon" id="userInitial2">U</div>
+            </div>
+        </div>
+        <div class="rewards-container">
+            <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+            <div class="points-display">
+                <h1 id="userPoints">85 Points  🎯 </h1>
+                <p>Points are awarded based on total garbage weight collected</p>
+            </div>
+            <div class="info-section" data-aos="fade-up">
+                <h2> 🎁  Redeem Your Points For:</h2>
+                <ul>
+                    <li> 🚌  Public transport fare concessions</li>
+                    <li> 💡  Discounts on municipal bills (water, electricity)</li>
+                    <li> 🛒  Coupons for eco-friendly shops</li>
+                    <li> 🏆  Community recognition badges</li>
+                    <li> 🎟️  Event tickets and workshop access</li>
+                </ul>
+            </div>
+            <div class="info-section" data-aos="fade-up" data-aos-delay="100">
+                <h2> 📊  How Points Are Earned:</h2>
+                <ul>
+                    <li>1kg biodegradable waste = <strong>5 points</strong></li>
+                    <li>1kg recyclable plastic = <strong>3 points</strong></li>
+                    <li>1kg paper waste = <strong>4 points</strong></li>
+                    <li>Reporting illegal dumping = <strong>10 points</strong></li>
+                    <li>Attending community events = <strong>15 points</strong></li>
+                </ul>
+            </div>
+            <button class="redeem-btn" onclick="showRedeemModal()">Redeem Now</button>
+        </div>
+    </div>
+    <div id="calendarPage" class="page calendar-page">
+        <div class="header">
+            <div class="logo"> 🏙  CLEAN CITY</div>
+            <div class="header-right">
+                <div class="profile-icon" id="userInitial3">U</div>
+            </div>
+        </div>
+        <div class="page-container">
+            <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+            <div class="calendar-container" data-aos="fade-up">
+                <div class="calendar-header">
+                    <h2> 📅  Pickup Calendar - November 2025</h2>
+                </div>
+                <div class="calendar-grid">
+                    <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div><div class="other-month"><span class="day-number">26</span></div><div class="other-month"><span class="day-number">27</span></div><div class="other-month"><span class="day-number">28</span></div><div class="other-month"><span class="day-number">29</span></div><div class="other-month"><span class="day-number">30</span></div><div class="other-month"><span class="day-number">31</span></div><div><span class="day-number">1</span></div><div><span class="day-number">2</span></div><div><span class="day-number">3</span><div class="pickup-event"> ♻️  Recycling<br>8:00 AM</div></div><div><span class="day-number">4</span></div><div><span class="day-number">5</span></div><div><span class="day-number">6</span></div><div><span class="day-number">7</span><div class="pickup-event"> 🌱  Bio-Waste<br>9:00 AM</div></div><div><span class="day-number">8</span></div><div><span class="day-number">9</span></div><div><span class="day-number">10</span><div class="pickup-event"> ♻️  Recycling<br>8:00 AM</div></div><div><span class="day-number">11</span></div><div><span class="day-number">12</span></div><div><span class="day-number">13</span></div><div><span class="day-number">14</span><div class="pickup-event"> 🌱  Bio-Waste<br>9:00 AM</div></div><div><span class="day-number">15</span></div><div><span class="day-number">16</span></div><div><span class="day-number">17</span><div class="pickup-event"> ♻️  Recycling<br>8:00 AM</div></div><div><span class="day-number">18</span></div><div><span class="day-number">19</span></div><div><span class="day-number">20</span></div><div><span class="day-number">21</span><div class="pickup-event"> 🌱  Bio-Waste<br>9:00 AM</div></div><div><span class="day-number">22</span></div><div><span class="day-number">23</span></div><div><span class="day-number">24</span><div class="pickup-event"> ♻️  Recycling<br>8:00 AM</div></div><div><span class="day-number">25</span></div><div><span class="day-number">26</span></div><div><span class="day-number">27</span></div><div><span class="day-number">28</span><div class="pickup-event"> 🌱  Bio-Waste<br>9:00 AM</div></div><div><span class="day-number">29</span></div><div><span class="day-number">30</span></div><div class="other-month"><span class="day-number">1</span></div><div class="other-month"><span class="day-number">2</span></div><div class="other-month"><span class="day-number">3</span></div><div class="other-month"><span class="day-number">4</span></div><div class="other-month"><span class="day-number">5</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="communityPage" class="page community-page">
+        <div class="header">
+            <div class="logo"> 🏙  CLEAN CITY</div>
+            <div class="header-right">
+                <div class="profile-icon" id="userInitial4">U</div>
+            </div>
+        </div>
+        <div class="page-container">
+            <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+            <div class="chat-container" data-aos="fade-up">
+                <div class="chat-header">
+                    <h2> 👥  Community Hub</h2>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message other">
+                        <span class="sender">Admin</span>
+                        Welcome to the hub! Remember, the community cleanup is this Saturday at 9 AM.
+                    </div>
+                    <div class="chat-message other">
+                        <span class="sender">Jane D.</span>
+                        Does anyone know if they accept soft plastics at the recycling center?
+                    </div>
+                    <div class="chat-message user">
+                        <span class="sender">You</span>
+                        I'm not sure, Jane. I'll check the website.
+                    </div>
+                     <div class="chat-message other">
+                        <span class="sender">Ravi K.</span>
+                        Just reported illegal dumping on 5th street using the app. Thanks for the feature!
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Type your message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="smartBinPage" class="page smart-bin-page">
+        <div class="header">
+            <div class="logo"> 🏙  CLEAN CITY</div>
+            <div class="header-right">
+                <div class="profile-icon" id="userInitial5">U</div>
+            </div>
+        </div>
+        <div class="page-container">
+            <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+            <h1 class="page-title"> 🗑️  Smart Bin Status</h1>
+            <div class="bin-grid">
+                <div class="bin-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bin-card-header">
+                        <h3> 🏠  Kitchen General Waste</h3>
+                        <span class="bin-id">#KITCH-01</span>
+                    </div>
+                    <p>Your primary household waste bin. Emptied weekly.</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill status-full" style="width: 95%;"></div>
+                    </div>
+                    <p class="status-text status-full">95% Full</p>
+                </div>
+                <div class="bin-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bin-card-header">
+                        <h3> ♻️  Household Recycling</h3>
+                        <span class="bin-id">#RECYC-01</span>
+                    </div>
+                    <p>For plastics, paper, and glass. Emptied bi-weekly.</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill status-warn" style="width: 65%;"></div>
+                    </div>
+                    <p class="status-text status-warn">65% Full</p>
+                </div>
+                <div class="bin-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bin-card-header">
+                        <h3> 🌳  Community Park Bin</h3>
+                        <span class="bin-id">#PARK-12B</span>
+                    </div>
+                    <p>Located near the main entrance of Sunrise Park.</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill status-ok" style="width: 20%;"></div>
+                    </div>
+                    <p class="status-text status-ok">20% Full</p>
+                </div>
+            </div>
+            <div class="info-section" data-aos="fade-up" data-aos-delay="400">
+                <h2> 🧠  How Smart Routing Works</h2>
+                <p style="margin-bottom: 15px;">This real-time data does more than just show you fill levels. It powers our city's smart waste collection system:</p>
+                <ul>
+                    <li><strong>1. Data Collection:</strong> Each smart bin has a sensor that measures its fill level and sends the data to our central system every hour.</li>
+                    <li><strong>2. Route Optimization:</strong> Our system analyzes which bins are full or nearly full (typically >85%). It then calculates the most efficient route for the collection truck to take, skipping bins that are mostly empty.</li>
+                    <li><strong>3. Dispatch:</strong> The optimized route is sent directly to the driver's navigation device, saving fuel, reducing emissions, and preventing overflowing bins.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    =====================================================================
+    MODALS
+    HTML is IDENTICAL, but they will inherit new styles
+    from .modal-content, .report-form-group, etc.
+    =====================================================================
+    -->
+    <div id="wasteModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('wasteModal')">&times;</span><h2> ♻️  Submit Waste</h2><p>Your waste has been recorded!</p><p style="font-size: 48px; margin: 20px 0; color: var(--text-heading);">+10 Points</p><p>Thank you for contributing to a cleaner city!  🌱 </p></div></div>
+    
+    <div id="reportFormModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('reportFormModal')">&times;</span><h2> 🚨  Report Illegal Dumping</h2><div class="report-form-group"><label for="crimePhoto">Upload Photo</label><input type="file" id="crimePhoto" accept="image/*"><label for="crimePhoto" class="file-upload-label">Choose File</label><span id="fileNamePreview">No file chosen</span></div><div class="report-form-group"><label for="crimeDescription">Description</label><textarea id="crimeDescription" placeholder="e.g., 'Bags of trash dumped by the river'"></textarea></div><div class="report-form-group"><label for="crimeLocation">Location</label><input type="text" id="crimeLocation" placeholder="e.g., 'Near 5th Street bridge'"></div><button class="report-submit-btn" onclick="submitReport()">Submit Report</button></div></div>
+    
+    <div id="reportSuccessModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('reportSuccessModal')">&times;</span><h2> 🚨  Report Submitted</h2><p>Thank you for reporting!</p><p style="font-size: 48px; margin: 20px 0; color: var(--text-heading);">+10 Points</p><p>Your report helps keep our city clean!  🏙️ </p></div></div>
+    
+    <div id="redeemModal" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('redeemModal')">&times;</span><h2> 🎁  Available Concessions</h2><div style="text-align: left; margin: 20px 0;">
+        <div class="redeem-item"><strong> 🚌  Transport Pass (50 points)</strong><p>Get 20% off on monthly bus pass</p></div>
+        <div class="redeem-item"><strong> 💡  Bill Discount (75 points)</strong><p>15% discount on electricity bill</p></div>
+        <div class="redeem-item"><strong> 🛒  Eco Shop Coupon (60 points)</strong><p>₹500 voucher for eco-friendly products</p></div>
+    </div><p>You have <strong id="pointsInModal">85 points</strong> available</p></div></div>
+
+    <!-- 
+    =====================================================================
+    SCRIPTS
+    JavaScript is IDENTICAL to your DOCX file.
+    All functionality is 100% preserved.
+    =====================================================================
+    -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        let userPoints = parseInt(localStorage.getItem('userPoints')) || 85;
+        let userName = localStorage.getItem('userName') || 'User';
+
+        function login() {
+            const name = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (name && password) {
+                userName = name;
+                localStorage.setItem('userName', name);
+                updateUserInitials();
+                showPage('dashboardPage');
+            } else {
+                // In a real app, you would show a custom modal error, not an alert.
+                // But preserving original functionality as requested.
+                alert('Please enter both name and password');
+            }
+        }
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Re-initialize AOS on page change
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+        }
+        function showDashboard() {
+            showPage('dashboardPage');
+        }
+        function showRewardsPage() {
+            updatePointsDisplay();
+            showPage('rewardsPage');
+        }
+        function showCalendarPage() {
+            showPage('calendarPage');
+        }
+        function showCommunityPage() {
+            showPage('communityPage');
+        }
+        function showSmartBinPage() {
+            showPage('smartBinPage');
+        }
+        function showWasteModal() {
+            document.getElementById('wasteModal').style.display = 'flex';
+            setTimeout(() => {
+                userPoints += 10;
+                localStorage.setItem('userPoints', userPoints);
+                updatePointsDisplay();
+            }, 100);
+        }
+        function showReportModal() {
+            document.getElementById('reportFormModal').style.display = 'flex';
+        }
+        
+        function submitReport() {
+            userPoints += 10; 
+            localStorage.setItem('userPoints', userPoints);
+            updatePointsDisplay();
+            closeModal('reportFormModal'); 
+            document.getElementById('reportSuccessModal').style.display = 'flex'; 
+        }
+        function showRedeemModal() {
+            document.getElementById('pointsInModal').textContent = userPoints + ' points';
+            document.getElementById('redeemModal').style.display = 'flex';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'reportFormModal') {
+                document.getElementById('crimePhoto').value = null;
+                document.getElementById('fileNamePreview').textContent = 'No file chosen';
+                document.getElementById('crimeDescription').value = '';
+                document.getElementById('crimeLocation').value = '';
+            }
+        }
+        function updatePointsDisplay() {
+            document.getElementById('userPoints').textContent = userPoints + ' Points  🎯 ';
+            document.getElementById('pointsInModal').textContent = userPoints + ' points';
+        }
+        function updateUserInitials() {
+            const initial = userName.charAt(0).toUpperCase();
+            document.getElementById('userInitial').textContent = initial;
+            document.getElementById('userInitial2').textContent = initial;
+            document.getElementById('userInitial3').textContent = initial;
+            document.getElementById('userInitial4').textContent = initial;
+            document.getElementById('userInitial5').textContent = initial;
+        }
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const messageText = chatInput.value;
+            if (messageText.trim() === '') {
+                return; 
+            }
+            const chatMessages = document.getElementById('chatMessages');
+            
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', 'user');
+            
+            // Basic sanitization (as in original file)
+            const safeText = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            messageElement.innerHTML = `<span class="sender">You</span> ${safeText}`;
+            
+            chatMessages.appendChild(messageElement);
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- Initialize on load ---
+        window.onload = function() {
+            // Initialize AOS
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 600,
+                    once: true,
+                    offset: 50,
+                });
+            }
+
+            if (localStorage.getItem('userName')) {
+                userName = localStorage.getItem('userName');
+                updateUserInitials();
+            }
+            updatePointsDisplay();
+            document.getElementById('crimePhoto').addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+                document.getElementById('fileNamePreview').textContent = fileName;
+            });
+        };
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        };
+    </script>
+</body>
+</html>
